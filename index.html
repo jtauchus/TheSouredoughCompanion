@@ -1,7 +1,52 @@
-</span>
-<p>Water: <span id="waterGrams">--</span> g</p>
-<p>Salt: <span id="saltGrams">--</span> g</p>
-<label>Sleep Start Time:</label>
+# Re-run after environment reset to save the updated HTML again
+html_content = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Souredough Companion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+        h1 { text-align: center; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 1em; }
+        .output { margin-top: 20px; padding: 10px; background: #eaeaea; border-radius: 5px; min-height: 100px; }
+        button { margin-top: 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .invalid { border: 2px solid red; }
+        .status { font-size: 1.2em; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>The Souredough Companion</h1>
+
+    <label>Number of Loaves:</label>
+    <select id="numLoaves" onchange="updateBlend()">
+        <option value="1">1</option>
+        <option value="2">2</option>
+    </select>
+
+    <label>Total Flour Weight (g):</label>
+    <input type="number" id="flourWeight" value="400" oninput="updateBlend()">
+
+    <label>Bread Flour %:</label>
+    <input type="range" id="breadFlourPct" min="0" max="100" value="75" oninput="updateBlend()">
+    <span id="breadFlourLabel">75%</span>
+
+    <label>Whole Wheat Flour %:</label>
+    <input type="range" id="wwFlourPct" min="0" max="100" value="25" oninput="updateBlend()">
+    <span id="wwFlourLabel">25%</span>
+
+    <label>Suggested Hydration:</label>
+    <span id="hydrationSuggestion">72%</span>
+
+    <p>Water: <span id="waterGrams">--</span> g</p>
+    <p>Salt: <span id="saltGrams">--</span> g</p>
+
+    <label>Sleep Start Time:</label>
     <input type="time" id="sleepStart" value="22:00">
 
     <label>Sleep End Time:</label>
@@ -44,11 +89,23 @@ function updateBlend() {
     document.getElementById('hydrationSuggestion').textContent = hydration + '%';
 
     let flourWeight = parseFloat(document.getElementById('flourWeight').value);
-    let waterWeight = (flourWeight * (hydration / 100)).toFixed(1);
-    let saltWeight = (flourWeight * 0.02).toFixed(1);
-    document.getElementById('waterGrams').textContent = waterWeight;
-    document.getElementById('saltGrams').textContent = saltWeight;
+    let numLoaves = parseInt(document.getElementById('numLoaves').value);
+    let totalFlour = flourWeight * numLoaves;
+
+    let waterGrams = (totalFlour * hydration / 100).toFixed(1);
+    let saltGrams = (totalFlour * 0.02).toFixed(1);
+
+    document.getElementById('waterGrams').textContent = waterGrams;
+    document.getElementById('saltGrams').textContent = saltGrams;
 }
 </script>
 </body>
 </html>
+"""
+
+# Save the updated HTML
+file_path = "/mnt/data/TheSouredoughCompanion.html"
+with open(file_path, "w") as f:
+    f.write(html_content)
+
+file_path
