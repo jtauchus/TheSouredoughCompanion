@@ -1,4 +1,4 @@
-# Re-run after environment reset to save the updated HTML again
+# Generate the updated HTML file for the user's bread-making app
 html_content = """
 <!DOCTYPE html>
 <html lang="en">
@@ -103,7 +103,7 @@ function updateBlend() {
 </html>
 """
 
-# Save the updated HTML
+# Save the updated file
 file_path = "/mnt/data/TheSouredoughCompanion.html"
 with open(file_path, "w") as f:
     f.write(html_content)
