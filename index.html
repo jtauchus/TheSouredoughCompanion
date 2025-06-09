@@ -12,16 +12,37 @@
     input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 1em; }
     .info { margin-top: 20px; background: #eaf0f4; padding: 15px; border-radius: 5px; }
     .info h3 { margin-top: 0; }
-    .highlight { font-weight: bold; color: #333; }
     .output { margin-top: 20px; }
-    button.toggle-btn { background-color: #007BFF; color: white; border: none; cursor: pointer; margin-top: 20px; }
-    button.toggle-btn:hover { background-color: #0056b3; }
+    button.toggle-btn, .help-btn {
+      background-color: #007BFF; color: white; border: none; cursor: pointer; margin-top: 20px;
+    }
+    button:hover { background-color: #0056b3; }
+
+    /* Modal styling */
+    .modal {
+      display: none; position: fixed; z-index: 1; left: 0; top: 0;
+      width: 100%; height: 100%; overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+      background-color: #fff; margin: 10% auto; padding: 20px;
+      border: 1px solid #888; width: 90%; max-width: 600px;
+      border-radius: 8px;
+    }
+    .close {
+      color: #aaa; float: right; font-size: 28px; font-weight: bold;
+    }
+    .close:hover, .close:focus {
+      color: black; text-decoration: none; cursor: pointer;
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <img src="header.png" alt="John's Souredough Companion Banner" style="width:100%; border-radius: 8px; margin-bottom: 20px;">
   <h1>John's Souredough Companion</h1>
+
+  <button class="help-btn" onclick="document.getElementById('helpModal').style.display='block'">How This Works</button>
 
   <label>Total Flour Weight (g):</label>
   <input type="number" id="flourWeight" value="400" oninput="updateBlend()">
@@ -33,8 +54,26 @@
   <label>Whole Wheat Flour %:</label>
   <p id="wwFlourLabel">25% (100g)</p>
 
+  <label>Bread Flour Protein %:</label>
+  <select id="breadProtein" onchange="updateBlend()">
+    <option value="10">10%</option>
+    <option value="11">11%</option>
+    <option value="12" selected>12%</option>
+    <option value="13">13%</option>
+    <option value="14">14%</option>
+  </select>
+
+  <label>Whole Wheat Protein %:</label>
+  <select id="wwProtein" onchange="updateBlend()">
+    <option value="11">11%</option>
+    <option value="12">12%</option>
+    <option value="13">13%</option>
+    <option value="14" selected>14%</option>
+    <option value="15">15%</option>
+  </select>
+
   <label>Suggested Hydration:</label>
-  <span id="hydrationSuggestion">72%</span>
+  <span id="hydrationSuggestion">--%</span>
 
   <p>Water: <span id="waterGrams">--</span> g</p>
   <p>Salt: <span id="saltGrams">--</span> g</p>
@@ -57,6 +96,21 @@
   </div>
 </div>
 
+<!-- Help Modal -->
+<div id="helpModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="document.getElementById('helpModal').style.display='none'">&times;</span>
+    <h2>About This App</h2>
+    <p>This tool helps you build a basic sourdough formula based on your flour blend and total flour weight.</p>
+    <p><strong>Hydration</strong> is automatically calculated based on the protein content of your flours. Generally:</p>
+    <ul>
+      <li>Higher protein flours absorb more water</li>
+      <li>Whole wheat tends to absorb more than white flour</li>
+    </ul>
+    <p>Use the sliders and dropdowns to fine-tune the blend. The tool then displays grams of water and salt needed (salt = 2% of total flour).</p>
+  </div>
+</div>
+
 <script>
 function updateBlend() {
   let breadPct = parseInt(document.getElementById('breadFlourPct').value);
@@ -69,10 +123,19 @@ function updateBlend() {
   document.getElementById('breadFlourLabel').textContent = `${breadPct}% (${breadGrams}g)`;
   document.getElementById('wwFlourLabel').textContent = `${wwPct}% (${wwGrams}g)`;
 
-  let hydration = (breadPct * 0.62 + wwPct * 0.85).toFixed(1);
-  document.getElementById('hydrationSuggestion').textContent = hydration + '%';
+  let breadProtein = parseFloat(document.getElementById('breadProtein').value);
+  let wwProtein = parseFloat(document.getElementById('wwProtein').value);
 
-  let waterGrams = (flourWeight * hydration / 100).toFixed(1);
+  // Simple hydration estimation formula
+  let breadHydration = 0.4 + 0.02 * breadProtein;
+  let wwHydration = 0.4 + 0.02 * wwProtein;
+
+  let hydration = ((breadPct * breadHydration + wwPct * wwHydration) / 100).toFixed(3);
+  let hydrationPct = (hydration * 100).toFixed(1);
+
+  document.getElementById('hydrationSuggestion').textContent = hydrationPct + '%';
+
+  let waterGrams = (flourWeight * hydration).toFixed(1);
   let saltGrams = (flourWeight * 0.02).toFixed(1);
 
   document.getElementById('waterGrams').textContent = waterGrams;
@@ -82,6 +145,14 @@ function updateBlend() {
 function toggleInstructions() {
   const section = document.getElementById('printInstructions');
   section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close modal on outside click
+window.onclick = function(event) {
+  let modal = document.getElementById('helpModal');
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
 }
 
 updateBlend();
