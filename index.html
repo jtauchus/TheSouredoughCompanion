@@ -1,10 +1,8 @@
-# Generate the updated HTML file for the user's bread-making app
-html_content = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>The Souredough Companion</title>
+    <title>John's Souredough Companion</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
@@ -21,13 +19,7 @@ html_content = """
 </head>
 <body>
 <div class="container">
-    <h1>The Souredough Companion</h1>
-
-    <label>Number of Loaves:</label>
-    <select id="numLoaves" onchange="updateBlend()">
-        <option value="1">1</option>
-        <option value="2">2</option>
-    </select>
+    <h1>John's Souredough Companion</h1>
 
     <label>Total Flour Weight (g):</label>
     <input type="number" id="flourWeight" value="400" oninput="updateBlend()">
@@ -89,11 +81,8 @@ function updateBlend() {
     document.getElementById('hydrationSuggestion').textContent = hydration + '%';
 
     let flourWeight = parseFloat(document.getElementById('flourWeight').value);
-    let numLoaves = parseInt(document.getElementById('numLoaves').value);
-    let totalFlour = flourWeight * numLoaves;
-
-    let waterGrams = (totalFlour * hydration / 100).toFixed(1);
-    let saltGrams = (totalFlour * 0.02).toFixed(1);
+    let waterGrams = (flourWeight * hydration / 100).toFixed(1);
+    let saltGrams = (flourWeight * 0.02).toFixed(1);
 
     document.getElementById('waterGrams').textContent = waterGrams;
     document.getElementById('saltGrams').textContent = saltGrams;
@@ -101,11 +90,3 @@ function updateBlend() {
 </script>
 </body>
 </html>
-"""
-
-# Save the updated file
-file_path = "/mnt/data/TheSouredoughCompanion.html"
-with open(file_path, "w") as f:
-    f.write(html_content)
-
-file_path
