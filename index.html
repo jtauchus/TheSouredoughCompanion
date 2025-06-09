@@ -1,91 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>John's Souredough Companion</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-        h1 { text-align: center; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 1em; }
-        .output { margin-top: 20px; padding: 10px; background: #eaeaea; border-radius: 5px; min-height: 100px; }
-        button { margin-top: 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #45a049; }
-        .invalid { border: 2px solid red; }
-        .status { font-size: 1.2em; font-weight: bold; margin-top: 10px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>John's Souredough Companion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
+    h1 { text-align: center; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 1em; }
+    .info { margin-top: 20px; background: #eaf0f4; padding: 15px; border-radius: 5px; }
+    .info h3 { margin-top: 0; }
+    .highlight { font-weight: bold; color: #333; }
+    .output { margin-top: 20px; }
+    button.toggle-btn { background-color: #007BFF; color: white; border: none; cursor: pointer; margin-top: 20px; }
+    button.toggle-btn:hover { background-color: #0056b3; }
+  </style>
 </head>
 <body>
 <div class="container">
-    <h1>John's Souredough Companion</h1>
+  <h1>John's Souredough Companion</h1>
 
-    <label>Total Flour Weight (g):</label>
-    <input type="number" id="flourWeight" value="400" oninput="updateBlend()">
+  <label>Total Flour Weight (g):</label>
+  <input type="number" id="flourWeight" value="400" oninput="updateBlend()">
 
-    <label>Bread Flour %:</label>
-    <input type="range" id="breadFlourPct" min="0" max="100" value="75" oninput="updateBlend()">
-    <span id="breadFlourLabel">75%</span>
+  <label>Bread Flour %:</label>
+  <input type="range" id="breadFlourPct" min="0" max="100" value="75" oninput="updateBlend()">
+  <span id="breadFlourLabel">75%</span>
 
-    <label>Whole Wheat Flour %:</label>
-    <input type="range" id="wwFlourPct" min="0" max="100" value="25" oninput="updateBlend()">
-    <span id="wwFlourLabel">25%</span>
+  <label>Whole Wheat Flour %:</label>
+  <input type="range" id="wwFlourPct" min="0" max="100" value="25" oninput="updateBlend()">
+  <span id="wwFlourLabel">25%</span>
 
-    <label>Suggested Hydration:</label>
-    <span id="hydrationSuggestion">72%</span>
+  <label>Suggested Hydration:</label>
+  <span id="hydrationSuggestion">72%</span>
 
-    <p>Water: <span id="waterGrams">--</span> g</p>
-    <p>Salt: <span id="saltGrams">--</span> g</p>
+  <p>Water: <span id="waterGrams">--</span> g</p>
+  <p>Salt: <span id="saltGrams">--</span> g</p>
 
-    <label>Sleep Start Time:</label>
-    <input type="time" id="sleepStart" value="22:00">
+  <button class="toggle-btn" onclick="toggleInstructions()">Toggle Printable Instructions</button>
 
-    <label>Sleep End Time:</label>
-    <input type="time" id="sleepEnd" value="06:00">
-
-    <label>Starter Build Needed?</label>
-    <select id="starterBuild">
-        <option value="yes" selected>Yes</option>
-        <option value="no">No</option>
-    </select>
-
-    <label>Proof Type:</label>
-    <select id="proofType">
-        <option value="cold" selected>Cold Proof</option>
-        <option value="ambient">Ambient Proof</option>
-        <option value="combo">Combo</option>
-    </select>
-
-    <label>Start Time:</label>
-    <input type="time" id="startTime" value="08:00">
-
-    <button onclick="generateSchedule()">Generate Schedule</button>
-    <button onclick="suggestStartTime()">Suggest Better Start Time</button>
-
-    <div class="status" id="statusIndicator"></div>
-    <div class="output" id="scheduleOutput">
-        <strong>Schedule will appear here.</strong>
-    </div>
+  <div class="info" id="printInstructions" style="display:none;">
+    <h3>Breadmaking Stages</h3>
+    <ol>
+      <li><strong>Feed Starter:</strong> Refresh starter 8–12 hours before use.</li>
+      <li><strong>Activate Starter:</strong> Use when doubled and bubbly.</li>
+      <li><strong>Make Dough:</strong> Mix flour, water, and starter. Add salt after autolyse.</li>
+      <li><strong>Build Dough Structure:</strong> Stretch and fold every 30–45 min.</li>
+      <li><strong>Bulk Rise:</strong> Let rise 3–6 hrs until ~doubled in size.</li>
+      <li><strong>Pre-shape:</strong> Rest dough 20–30 minutes after light shaping.</li>
+      <li><strong>Final Shape:</strong> Form dough into final shape for proofing.</li>
+      <li><strong>Proofing:</strong> Room temp (1–2 hrs) or cold proof overnight.</li>
+      <li><strong>Bake:</strong> Score and bake at 450–475°F until golden.</li>
+    </ol>
+  </div>
 </div>
 
 <script>
 function updateBlend() {
-    let breadPct = parseInt(document.getElementById('breadFlourPct').value);
-    let wwPct = 100 - breadPct;
-    document.getElementById('breadFlourLabel').textContent = breadPct + '%';
-    document.getElementById('wwFlourLabel').textContent = wwPct + '%';
-    document.getElementById('wwFlourPct').value = wwPct;
+  let breadPct = parseInt(document.getElementById('breadFlourPct').value);
+  let wwPct = 100 - breadPct;
+  document.getElementById('breadFlourLabel').textContent = breadPct + '%';
+  document.getElementById('wwFlourLabel').textContent = wwPct + '%';
+  document.getElementById('wwFlourPct').value = wwPct;
 
-    let hydration = (breadPct * 0.62 + wwPct * 0.85).toFixed(1);
-    document.getElementById('hydrationSuggestion').textContent = hydration + '%';
+  let hydration = (breadPct * 0.62 + wwPct * 0.85).toFixed(1);
+  document.getElementById('hydrationSuggestion').textContent = hydration + '%';
 
-    let flourWeight = parseFloat(document.getElementById('flourWeight').value);
-    let waterGrams = (flourWeight * hydration / 100).toFixed(1);
-    let saltGrams = (flourWeight * 0.02).toFixed(1);
+  let flourWeight = parseFloat(document.getElementById('flourWeight').value);
+  let waterGrams = (flourWeight * hydration / 100).toFixed(1);
+  let saltGrams = (flourWeight * 0.02).toFixed(1);
 
-    document.getElementById('waterGrams').textContent = waterGrams;
-    document.getElementById('saltGrams').textContent = saltGrams;
+  document.getElementById('waterGrams').textContent = waterGrams;
+  document.getElementById('saltGrams').textContent = saltGrams;
+}
+
+function toggleInstructions() {
+  const section = document.getElementById('printInstructions');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
 }
 </script>
 </body>
