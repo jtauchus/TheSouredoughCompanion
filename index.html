@@ -35,6 +35,35 @@
     .close:hover, .close:focus {
       color: black; text-decoration: none; cursor: pointer;
     }
+
+    /* Animated Ad */
+    .ad-box {
+      margin-top: 40px;
+      padding: 15px;
+      background-color: #fffbe6;
+      border: 3px dashed #ffa500;
+      border-radius: 8px;
+      text-align: center;
+      animation: pulse 3s infinite;
+    }
+    .ad-box h2 {
+      margin-bottom: 10px;
+      font-size: 1.5em;
+      color: #d35400;
+    }
+    .ad-box a {
+      font-weight: bold;
+      color: #c0392b;
+      text-decoration: none;
+    }
+    .ad-box a:hover {
+      text-decoration: underline;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 165, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0); }
+    }
   </style>
 </head>
 <body>
@@ -94,6 +123,14 @@
       <li><strong>Bake:</strong> Score and bake at 450–475°F until golden.</li>
     </ol>
   </div>
+
+  <!-- 🛒 Etsy Advertisement -->
+  <div class="ad-box">
+    <h2>🍞 Looking for Bread-Making Tools?</h2>
+    <p>
+      Visit <a href="https://www.etsy.com/shop/NerdFabrication" target="_blank">NerdFabrication.com</a> for handmade sourdough lames, bread bows, and other occasionally nerdy baking gear!
+    </p>
+  </div>
 </div>
 
 <!-- Help Modal -->
@@ -126,7 +163,6 @@ function updateBlend() {
   let breadProtein = parseFloat(document.getElementById('breadProtein').value);
   let wwProtein = parseFloat(document.getElementById('wwProtein').value);
 
-  // Simple hydration estimation formula
   let breadHydration = 0.4 + 0.02 * breadProtein;
   let wwHydration = 0.4 + 0.02 * wwProtein;
 
@@ -147,7 +183,6 @@ function toggleInstructions() {
   section.style.display = section.style.display === 'none' ? 'block' : 'none';
 }
 
-// Close modal on outside click
 window.onclick = function(event) {
   let modal = document.getElementById('helpModal');
   if (event.target == modal) {
