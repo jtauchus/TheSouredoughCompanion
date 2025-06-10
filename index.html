@@ -13,56 +13,20 @@
     .info { margin-top: 20px; background: #eaf0f4; padding: 15px; border-radius: 5px; }
     .info h3 { margin-top: 0; }
     .output { margin-top: 20px; }
-    button.toggle-btn, .help-btn {
+    button.toggle-btn, .help-btn, .print-btn {
       background-color: #007BFF; color: white; border: none; cursor: pointer; margin-top: 20px;
     }
     button:hover { background-color: #0056b3; }
 
-    /* Modal styling */
-    .modal {
-      display: none; position: fixed; z-index: 1; left: 0; top: 0;
-      width: 100%; height: 100%; overflow: auto;
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-    .modal-content {
-      background-color: #fff; margin: 10% auto; padding: 20px;
-      border: 1px solid #888; width: 90%; max-width: 600px;
-      border-radius: 8px;
-    }
-    .close {
-      color: #aaa; float: right; font-size: 28px; font-weight: bold;
-    }
-    .close:hover, .close:focus {
-      color: black; text-decoration: none; cursor: pointer;
+    .summary-box {
+      background: #f9f9f9; padding: 15px; margin-top: 20px; border: 1px solid #ccc; border-radius: 6px;
     }
 
-    /* Animated Ad */
-    .ad-box {
-      margin-top: 40px;
-      padding: 15px;
-      background-color: #fffbe6;
-      border: 3px dashed #ffa500;
-      border-radius: 8px;
-      text-align: center;
-      animation: pulse 3s infinite;
-    }
-    .ad-box h2 {
-      margin-bottom: 10px;
-      font-size: 1.5em;
-      color: #d35400;
-    }
-    .ad-box a {
-      font-weight: bold;
-      color: #c0392b;
-      text-decoration: none;
-    }
-    .ad-box a:hover {
-      text-decoration: underline;
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(255, 165, 0, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0); }
+    /* Print styles */
+    @media print {
+      body * { visibility: hidden; }
+      #summaryBox, #summaryBox * { visibility: visible; }
+      #summaryBox { position: absolute; top: 0; left: 0; width: 100%; }
     }
   </style>
 </head>
@@ -70,8 +34,6 @@
 <div class="container">
   <img src="header.png" alt="John's Sourdough Companion Banner" style="width:100%; border-radius: 8px; margin-bottom: 20px;">
   <h1>John's Sourdough Companion</h1>
-
-  <button class="help-btn" onclick="document.getElementById('helpModal').style.display='block'">Click here for How This Works</button>
 
   <label>Total Flour Weight (g):</label>
   <input type="number" id="flourWeight" value="400" oninput="updateBlend()">
@@ -106,45 +68,17 @@
 
   <p>Water: <span id="waterGrams">--</span> g</p>
   <p>Salt: <span id="saltGrams">--</span> g</p>
+  <p>Starter: <span id="starterGrams">--</span> g (20% of flour)</p>
 
-  <button class="toggle-btn" onclick="toggleInstructions()">Toggle Printable Instructions</button>
+  <button class="print-btn" onclick="printSummary()">Print Summary</button>
 
-  <div class="info" id="printInstructions" style="display:none;">
-    <h3>Breadmaking Stages</h3>
-    <ol>
-      <li><strong>Feed Starter:</strong> Refresh starter 8–12 hours before use.</li>
-      <li><strong>Activate Starter:</strong> Use when doubled and bubbly.</li>
-      <li><strong>Make Dough:</strong> Mix flour, water, and starter. Add salt after autolyse.</li>
-      <li><strong>Build Dough Structure:</strong> Stretch and fold every 30–45 min.</li>
-      <li><strong>Bulk Rise:</strong> Let rise 3–6 hrs until ~doubled in size.</li>
-      <li><strong>Pre-shape:</strong> Rest dough 20–30 minutes after light shaping.</li>
-      <li><strong>Final Shape:</strong> Form dough into final shape for proofing.</li>
-      <li><strong>Proofing:</strong> Room temp (1–2 hrs) or cold proof overnight.</li>
-      <li><strong>Bake:</strong> Score and bake at 450–475°F until golden.</li>
-    </ol>
-  </div>
-
-  <!-- 🛒 Etsy Advertisement -->
-  <div class="ad-box">
-    <h2>🍞 Looking for Bread-Making Tools?</h2>
-    <p>
-      Visit <a href="https://www.etsy.com/shop/NerdFabrication" target="_blank">NerdFabrication.com</a> for handmade sourdough lames, bread bows, and other occasionally nerdy baking gear!
-    </p>
-  </div>
-</div>
-
-<!-- Help Modal -->
-<div id="helpModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="document.getElementById('helpModal').style.display='none'">&times;</span>
-    <h2>About This App</h2>
-    <p>This tool helps you build a basic sourdough formula based on your flour blend and total flour weight.</p>
-    <p><strong>Hydration</strong> is automatically calculated based on the protein content of your flours. Generally:</p>
-    <ul>
-      <li>Higher protein flours absorb more water</li>
-      <li>Whole wheat tends to absorb more than white flour</li>
-    </ul>
-    <p>Use the sliders and dropdowns to fine-tune the blend. The tool then displays grams of water and salt needed (salt = 2% of total flour).</p>
+  <div id="summaryBox" class="summary-box">
+    <h3>Recipe Summary</h3>
+    <p id="summaryFlours"></p>
+    <p id="summaryWater"></p>
+    <p id="summarySalt"></p>
+    <p id="summaryStarter"></p>
+    <p id="summaryHydration"></p>
   </div>
 </div>
 
@@ -152,8 +86,8 @@
 function updateBlend() {
   let breadPct = parseInt(document.getElementById('breadFlourPct').value);
   let wwPct = 100 - breadPct;
-
   let flourWeight = parseFloat(document.getElementById('flourWeight').value);
+
   let breadGrams = ((breadPct / 100) * flourWeight).toFixed(1);
   let wwGrams = ((wwPct / 100) * flourWeight).toFixed(1);
 
@@ -165,29 +99,26 @@ function updateBlend() {
 
   let breadHydration = 0.4 + 0.02 * breadProtein;
   let wwHydration = 0.4 + 0.02 * wwProtein;
-
   let hydration = ((breadPct * breadHydration + wwPct * wwHydration) / 100).toFixed(3);
   let hydrationPct = (hydration * 100).toFixed(1);
-
-  document.getElementById('hydrationSuggestion').textContent = hydrationPct + '%';
-
   let waterGrams = (flourWeight * hydration).toFixed(1);
   let saltGrams = (flourWeight * 0.02).toFixed(1);
+  let starterGrams = (flourWeight * 0.2).toFixed(1);
 
+  document.getElementById('hydrationSuggestion').textContent = hydrationPct + '%';
   document.getElementById('waterGrams').textContent = waterGrams;
   document.getElementById('saltGrams').textContent = saltGrams;
+  document.getElementById('starterGrams').textContent = starterGrams;
+
+  document.getElementById('summaryFlours').textContent = `Bread Flour: ${breadPct}% (${breadGrams}g), Whole Wheat Flour: ${wwPct}% (${wwGrams}g)`;
+  document.getElementById('summaryWater').textContent = `Water: ${waterGrams}g`;
+  document.getElementById('summarySalt').textContent = `Salt: ${saltGrams}g (2% of flour)`;
+  document.getElementById('summaryStarter').textContent = `Starter: ${starterGrams}g (20% of flour)`;
+  document.getElementById('summaryHydration').textContent = `Hydration: ${hydrationPct}%`;
 }
 
-function toggleInstructions() {
-  const section = document.getElementById('printInstructions');
-  section.style.display = section.style.display === 'none' ? 'block' : 'none';
-}
-
-window.onclick = function(event) {
-  let modal = document.getElementById('helpModal');
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
+function printSummary() {
+  window.print();
 }
 
 updateBlend();
