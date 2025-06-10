@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="="en">
 <head>
   <meta charset="UTF-8">
   <title>John's Sourdough Companion</title>
@@ -10,23 +10,36 @@
     .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
     label { display: block; margin-top: 15px; font-weight: bold; }
     input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 1em; }
-    .info { margin-top: 20px; background: #eaf0f4; padding: 15px; border-radius: 5px; }
-    .info h3 { margin-top: 0; }
-    .output { margin-top: 20px; }
-    button.toggle-btn, .help-btn, .print-btn {
-      background-color: #007BFF; color: white; border: none; cursor: pointer; margin-top: 20px;
-    }
-    button:hover { background-color: #0056b3; }
-
     .summary-box {
       background: #f9f9f9; padding: 15px; margin-top: 20px; border: 1px solid #ccc; border-radius: 6px;
     }
+    button { background-color: #007BFF; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    .print-btn { margin-top: 20px; }
+    .help-btn { margin-bottom: 20px; }
 
-    /* Print styles */
     @media print {
       body * { visibility: hidden; }
       #summaryBox, #summaryBox * { visibility: visible; }
       #summaryBox { position: absolute; top: 0; left: 0; width: 100%; }
+    }
+
+    #helpModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+    }
+
+    #helpContent {
+      background: white;
+      max-width: 600px;
+      margin: 100px auto;
+      padding: 20px;
+      border-radius: 10px;
+      position: relative;
     }
   </style>
 </head>
@@ -34,6 +47,10 @@
 <div class="container">
   <img src="header.png" alt="John's Sourdough Companion Banner" style="width:100%; border-radius: 8px; margin-bottom: 20px;">
   <h1>John's Sourdough Companion</h1>
+
+  <button class="help-btn" onclick="document.getElementById('helpModal').style.display='block'">
+    Click here for how this works
+  </button>
 
   <label>Total Flour Weight (g):</label>
   <input type="number" id="flourWeight" value="400" oninput="updateBlend()">
@@ -79,6 +96,23 @@
     <p id="summarySalt"></p>
     <p id="summaryStarter"></p>
     <p id="summaryHydration"></p>
+  </div>
+</div>
+
+<!-- Modal Help Window -->
+<div id="helpModal">
+  <div id="helpContent">
+    <h2>How This Works</h2>
+    <p>This tool helps you build a custom sourdough recipe based on total flour weight and flour blend.</p>
+    <ul>
+      <li><strong>Flour Weight:</strong> Set how much flour you're using (e.g. 400g total).</li>
+      <li><strong>Bread Flour Slider:</strong> Adjust to set how much is bread vs. whole wheat.</li>
+      <li><strong>Protein %:</strong> These affect how much water your flour absorbs.</li>
+      <li><strong>Hydration:</strong> The app recommends hydration based on your flour blend and protein level.</li>
+      <li><strong>Starter:</strong> Assumes 20% of total flour weight. Can be customized in future versions.</li>
+      <li><strong>Print Summary:</strong> Click to print your custom formula!</li>
+    </ul>
+    <button onclick="document.getElementById('helpModal').style.display='none'">Close</button>
   </div>
 </div>
 
