@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="="en">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>John's Sourdough Companion</title>
@@ -7,7 +7,7 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
     h1 { text-align: center; }
-    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
     label { display: block; margin-top: 15px; font-weight: bold; }
     input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 1em; }
     .summary-box {
@@ -16,78 +16,94 @@
     button { background-color: #007BFF; color: white; border: none; cursor: pointer; }
     button:hover { background-color: #0056b3; }
     .print-btn { margin-top: 20px; }
-    .help-btn { margin-bottom: 20px; }
-
+    .save-btn { margin-top: 20px; background-color: #28a745; }
+    .save-btn:hover { background-color: #1e7e34; }
+    .load-btn { margin-top: 10px; background-color: #ffc107; }
+    .load-btn:hover { background-color: #e0a800; }
     @media print {
       body * { visibility: hidden; }
       #summaryBox, #summaryBox * { visibility: visible; }
       #summaryBox { position: absolute; top: 0; left: 0; width: 100%; }
     }
-
-    #helpModal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 1000;
-    }
-
-    #helpContent {
-      background: white;
-      max-width: 600px;
-      margin: 100px auto;
-      padding: 20px;
-      border-radius: 10px;
-      position: relative;
-    }
   </style>
 </head>
 <body>
 <div class="container">
-  <img src="header.png" alt="John's Sourdough Companion Banner" style="width:100%; border-radius: 8px; margin-bottom: 20px;">
   <h1>John's Sourdough Companion</h1>
 
-  <button class="help-btn" onclick="document.getElementById('helpModal').style.display='block'">
-    Click here for how this works
-  </button>
+  <label>Input Mode:</label>
+  <select id="inputMode" onchange="toggleInputMode()">
+    <option value="percent" selected>Percent Mode</option>
+    <option value="grams">Grams Mode</option>
+  </select>
 
-  <label>Total Flour Weight (g):</label>
-  <input type="number" id="flourWeight" value="400" oninput="updateBlend()">
+  <div id="percentInputs">
+    <label>Total Flour Weight (g):</label>
+    <input type="number" id="flourWeight" value="400" oninput="updateFromPercent()">
 
-  <label>Bread Flour %:</label>
-  <input type="range" id="breadFlourPct" min="0" max="100" value="75" oninput="updateBlend()">
-  <p id="breadFlourLabel">75% (300g)</p>
+    <label>Bread Flour %:</label>
+    <input type="range" id="breadPct" min="0" max="100" value="60" oninput="updateFromPercent()">
+    <p id="breadPctLabel"></p>
 
-  <label>Whole Wheat Flour %:</label>
-  <p id="wwFlourLabel">25% (100g)</p>
+    <label>Whole Wheat Flour %:</label>
+    <input type="range" id="wwPct" min="0" max="100" value="20" oninput="updateFromPercent()">
+    <p id="wwPctLabel"></p>
+
+    <label>Rye Flour %:</label>
+    <input type="range" id="ryePct" min="0" max="100" value="10" oninput="updateFromPercent()">
+    <p id="ryePctLabel"></p>
+
+    <label>Spelt Flour %:</label>
+    <input type="range" id="speltPct" min="0" max="100" value="10" oninput="updateFromPercent()">
+    <p id="speltPctLabel"></p>
+  </div>
+
+  <div id="gramInputs" style="display:none;">
+    <label>Bread Flour Weight (g):</label>
+    <input type="number" id="breadGrams" value="240" oninput="updateFromGrams()">
+
+    <label>Whole Wheat Flour Weight (g):</label>
+    <input type="number" id="wwGrams" value="80" oninput="updateFromGrams()">
+
+    <label>Rye Flour Weight (g):</label>
+    <input type="number" id="ryeGrams" value="40" oninput="updateFromGrams()">
+
+    <label>Spelt Flour Weight (g):</label>
+    <input type="number" id="speltGrams" value="40" oninput="updateFromGrams()">
+  </div>
 
   <label>Bread Flour Protein %:</label>
-  <select id="breadProtein" onchange="updateBlend()">
-    <option value="10">10%</option>
+  <select id="breadProtein" onchange="updateCalculations()">
     <option value="11">11%</option>
+    <option value="12" selected>12%</option>
+    <option value="13">13%</option>
+  </select>
+
+  <label>Whole Wheat Protein %:</label>
+  <select id="wwProtein" onchange="updateCalculations()">
+    <option value="12">12%</option>
+    <option value="13" selected>13%</option>
+    <option value="14">14%</option>
+  </select>
+
+  <label>Rye Protein %:</label>
+  <select id="ryeProtein" onchange="updateCalculations()">
+    <option value="10" selected>10%</option>
+    <option value="11">11%</option>
+    <option value="12">12%</option>
+  </select>
+
+  <label>Spelt Protein %:</label>
+  <select id="speltProtein" onchange="updateCalculations()">
     <option value="12" selected>12%</option>
     <option value="13">13%</option>
     <option value="14">14%</option>
   </select>
 
-  <label>Whole Wheat Protein %:</label>
-  <select id="wwProtein" onchange="updateBlend()">
-    <option value="11">11%</option>
-    <option value="12">12%</option>
-    <option value="13">13%</option>
-    <option value="14" selected>14%</option>
-    <option value="15">15%</option>
-  </select>
-
-  <label>Suggested Hydration:</label>
-  <span id="hydrationSuggestion">--%</span>
-
-  <p>Water: <span id="waterGrams">--</span> g</p>
-  <p>Salt: <span id="saltGrams">--</span> g</p>
-  <p>Starter: <span id="starterGrams">--</span> g (20% of flour)</p>
-
-  <button class="print-btn" onclick="printSummary()">Print Summary</button>
+  <h3>Hydration: <span id="hydrationOutput">--%</span></h3>
+  <p>Water: <span id="waterOutput">--</span> g</p>
+  <p>Salt: <span id="saltOutput">--</span> g</p>
+  <p>Starter: <span id="starterOutput">--</span> g</p>
 
   <div id="summaryBox" class="summary-box">
     <h3>Recipe Summary</h3>
@@ -97,65 +113,113 @@
     <p id="summaryStarter"></p>
     <p id="summaryHydration"></p>
   </div>
-</div>
 
-<!-- Modal Help Window -->
-<div id="helpModal">
-  <div id="helpContent">
-    <h2>How This Works</h2>
-    <p>This tool helps you build a custom sourdough recipe based on total flour weight and flour blend.</p>
-    <ul>
-      <li><strong>Flour Weight:</strong> Set how much flour you're using (e.g. 400g total).</li>
-      <li><strong>Bread Flour Slider:</strong> Adjust to set how much is bread vs. whole wheat.</li>
-      <li><strong>Protein %:</strong> These affect how much water your flour absorbs.</li>
-      <li><strong>Hydration:</strong> The app recommends hydration based on your flour blend and protein level.</li>
-      <li><strong>Starter:</strong> Assumes 20% of total flour weight. Can be customized in future versions.</li>
-      <li><strong>Print Summary:</strong> Click to print your custom formula!</li>
-    </ul>
-    <button onclick="document.getElementById('helpModal').style.display='none'">Close</button>
-  </div>
+  <button class="save-btn" onclick="saveRecipe()">Save Recipe</button>
+  <button class="load-btn" onclick="loadRecipe()">Load Recipe</button>
+  <button class="print-btn" onclick="window.print()">Print Summary</button>
+
 </div>
 
 <script>
-function updateBlend() {
-  let breadPct = parseInt(document.getElementById('breadFlourPct').value);
-  let wwPct = 100 - breadPct;
-  let flourWeight = parseFloat(document.getElementById('flourWeight').value);
-
-  let breadGrams = ((breadPct / 100) * flourWeight).toFixed(1);
-  let wwGrams = ((wwPct / 100) * flourWeight).toFixed(1);
-
-  document.getElementById('breadFlourLabel').textContent = `${breadPct}% (${breadGrams}g)`;
-  document.getElementById('wwFlourLabel').textContent = `${wwPct}% (${wwGrams}g)`;
-
-  let breadProtein = parseFloat(document.getElementById('breadProtein').value);
-  let wwProtein = parseFloat(document.getElementById('wwProtein').value);
-
-  let breadHydration = 0.4 + 0.02 * breadProtein;
-  let wwHydration = 0.4 + 0.02 * wwProtein;
-  let hydration = ((breadPct * breadHydration + wwPct * wwHydration) / 100).toFixed(3);
-  let hydrationPct = (hydration * 100).toFixed(1);
-  let waterGrams = (flourWeight * hydration).toFixed(1);
-  let saltGrams = (flourWeight * 0.02).toFixed(1);
-  let starterGrams = (flourWeight * 0.2).toFixed(1);
-
-  document.getElementById('hydrationSuggestion').textContent = hydrationPct + '%';
-  document.getElementById('waterGrams').textContent = waterGrams;
-  document.getElementById('saltGrams').textContent = saltGrams;
-  document.getElementById('starterGrams').textContent = starterGrams;
-
-  document.getElementById('summaryFlours').textContent = `Bread Flour: ${breadPct}% (${breadGrams}g), Whole Wheat Flour: ${wwPct}% (${wwGrams}g)`;
-  document.getElementById('summaryWater').textContent = `Water: ${waterGrams}g`;
-  document.getElementById('summarySalt').textContent = `Salt: ${saltGrams}g (2% of flour)`;
-  document.getElementById('summaryStarter').textContent = `Starter: ${starterGrams}g (20% of flour)`;
-  document.getElementById('summaryHydration').textContent = `Hydration: ${hydrationPct}%`;
+function toggleInputMode() {
+  const mode = document.getElementById("inputMode").value;
+  document.getElementById("percentInputs").style.display = mode === "percent" ? "block" : "none";
+  document.getElementById("gramInputs").style.display = mode === "grams" ? "block" : "none";
+  updateCalculations();
 }
 
-function printSummary() {
-  window.print();
+function updateFromPercent() {
+  const totalFlour = parseFloat(document.getElementById("flourWeight").value);
+  const breadPct = parseFloat(document.getElementById("breadPct").value);
+  const wwPct = parseFloat(document.getElementById("wwPct").value);
+  const ryePct = parseFloat(document.getElementById("ryePct").value);
+  const speltPct = parseFloat(document.getElementById("speltPct").value);
+  const totalPct = breadPct + wwPct + ryePct + speltPct;
+
+  // normalize if needed
+  document.getElementById("breadPctLabel").innerText = `Bread: ${breadPct}%`;
+  document.getElementById("wwPctLabel").innerText = `Whole Wheat: ${wwPct}%`;
+  document.getElementById("ryePctLabel").innerText = `Rye: ${ryePct}%`;
+  document.getElementById("speltPctLabel").innerText = `Spelt: ${speltPct}%`;
+
+  document.getElementById("breadGrams").value = (totalFlour * breadPct / 100).toFixed(1);
+  document.getElementById("wwGrams").value = (totalFlour * wwPct / 100).toFixed(1);
+  document.getElementById("ryeGrams").value = (totalFlour * ryePct / 100).toFixed(1);
+  document.getElementById("speltGrams").value = (totalFlour * speltPct / 100).toFixed(1);
+
+  updateCalculations();
 }
 
-updateBlend();
+function updateFromGrams() {
+  const breadGrams = parseFloat(document.getElementById("breadGrams").value);
+  const wwGrams = parseFloat(document.getElementById("wwGrams").value);
+  const ryeGrams = parseFloat(document.getElementById("ryeGrams").value);
+  const speltGrams = parseFloat(document.getElementById("speltGrams").value);
+  const totalFlour = breadGrams + wwGrams + ryeGrams + speltGrams;
+
+  document.getElementById("flourWeight").value = totalFlour.toFixed(1);
+
+  document.getElementById("breadPct").value = ((breadGrams/totalFlour)*100).toFixed(1);
+  document.getElementById("wwPct").value = ((wwGrams/totalFlour)*100).toFixed(1);
+  document.getElementById("ryePct").value = ((ryeGrams/totalFlour)*100).toFixed(1);
+  document.getElementById("speltPct").value = ((speltGrams/totalFlour)*100).toFixed(1);
+
+  updateFromPercent();
+}
+
+function updateCalculations() {
+  const bread = parseFloat(document.getElementById("breadGrams").value);
+  const ww = parseFloat(document.getElementById("wwGrams").value);
+  const rye = parseFloat(document.getElementById("ryeGrams").value);
+  const spelt = parseFloat(document.getElementById("speltGrams").value);
+  const totalFlour = bread + ww + rye + spelt;
+
+  const bp = parseFloat(document.getElementById("breadProtein").value);
+  const wwp = parseFloat(document.getElementById("wwProtein").value);
+  const rp = parseFloat(document.getElementById("ryeProtein").value);
+  const sp = parseFloat(document.getElementById("speltProtein").value);
+
+  const hydration = (
+    (bread*(0.4+0.02*bp) + ww*(0.4+0.02*wwp) + rye*(0.4+0.02*rp) + spelt*(0.4+0.02*sp)) 
+    / totalFlour
+  );
+
+  const water = totalFlour * hydration;
+  const salt = totalFlour * 0.02;
+  const starter = totalFlour * 0.20;
+
+  document.getElementById("hydrationOutput").innerText = (hydration*100).toFixed(1) + "%";
+  document.getElementById("waterOutput").innerText = water.toFixed(1);
+  document.getElementById("saltOutput").innerText = salt.toFixed(1);
+  document.getElementById("starterOutput").innerText = starter.toFixed(1);
+
+  document.getElementById("summaryFlours").innerText = 
+    `Bread: ${bread}g, Whole Wheat: ${ww}g, Rye: ${rye}g, Spelt: ${spelt}g`;
+  document.getElementById("summaryWater").innerText = `Water: ${water.toFixed(1)}g`;
+  document.getElementById("summarySalt").innerText = `Salt: ${salt.toFixed(1)}g`;
+  document.getElementById("summaryStarter").innerText = `Starter: ${starter.toFixed(1)}g`;
+  document.getElementById("summaryHydration").innerText = `Hydration: ${(hydration*100).toFixed(1)}%`;
+}
+
+function saveRecipe() {
+  const data = document.querySelectorAll("input, select");
+  const obj = {};
+  data.forEach(e => obj[e.id] = e.value);
+  localStorage.setItem("sourdough_recipe", JSON.stringify(obj));
+  alert("Recipe Saved!");
+}
+
+function loadRecipe() {
+  const data = JSON.parse(localStorage.getItem("sourdough_recipe"));
+  if (!data) return alert("No recipe saved.");
+  for (const id in data) {
+    if (document.getElementById(id)) document.getElementById(id).value = data[id];
+  }
+  toggleInputMode();
+}
+
+toggleInputMode();
 </script>
+
 </body>
 </html>
